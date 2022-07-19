@@ -1,3 +1,4 @@
-# telemetry
+# Telemetry, GPS, Solar
+### Group 5
 
-group 5 - telemetry, gps, solar
+json-gps : Arduino Program to read in GPS tracking coordinates at GMT time and document desired data into JSON format.
