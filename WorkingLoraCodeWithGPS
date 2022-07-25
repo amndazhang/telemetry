@@ -60,8 +60,8 @@ void loop()
 
   if (gps.location.isValid())
   {
-    gpstime += (gps.location.lat(), 6);
-    gpstime += "," + (gps.location.lng(), 6);
+    gpstime += String(gps.location.lat(), 6); 
+    gpstime += "," + String(gps.location.lng(), 6);
   }
   else
   {
@@ -94,7 +94,7 @@ void loop()
   String timeStr;
   if (gps.date.isValid() && gps.time.isValid()) {
     timeStr = String(gps.date.year()) + "-" + String(gps.date.month()) + "-" + String(gps.date.day()) + " " + hour + ":" + minute + ":" + second;
-    gpstime += "," + timeStr + "}";
+    gpstime += "," + timeStr;
   }
   else {
     Serial.println("NA");
