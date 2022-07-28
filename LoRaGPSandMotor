@@ -1,0 +1,328 @@
+#include <TinyGPSPlus.h>
+#include <SoftwareSerial.h>
+/*
+   This sample sketch demonstrates the normal use of a TinyGPSPlus (TinyGPSPlus) object.
+   It requires the use of SoftwareSerial, and assumes that you have a
+   4800-baud serial GPS device hooked up on pins 4(rx) and 3(tx).
+*/
+static const int RXPin = 32, TXPin = 33;
+static const uint32_t GPSBaud = 9600;
+
+// The TinyGPSPlus object
+TinyGPSPlus gps;
+
+// The serial connection to the GPS device
+SoftwareSerial ss(RXPin, TXPin);
+
+#include "heltec.h"
+#define BAND    915E6
+
+//NEW CODE BEGIN
+
+#define outputA 3
+#define outputB 4
+#define pulsesPerRot 20
+
+unsigned long lastMillis = 0;
+unsigned long lastMillis2 = 0;
+int aState;
+int aLastState;
+int rot = 0;
+int depth = 0;
+int counter = 0;
+int counter2 = 0;
+bool measure = false;
+float tds;
+float temp;
+float ph;
+float data[3];
+String sensorDATA;
+
+//NEW CODE END
+            
+int startTime = millis();
+//String message;
+
+String zero = "0";
+
+void setup()
+{
+
+  pinMode(8, OUTPUT);
+  pinMode(9, OUTPUT);
+  pinMode (outputA, INPUT);
+  pinMode (outputB, INPUT);
+  
+  Heltec.begin(true /*DisplayEnable Enable*/, true /*Heltec.LoRa Disable*/, false /*Serial Enable*/, true /*PABOOST Enable*/, BAND /*long BAND*/);
+
+  Serial.begin(115200);
+  while(!Serial);
+  ss.begin(GPSBaud);
+  while(!ss);
+  aLastState = digitalRead(outputA);
+
+  Serial.println(F("DeviceExample.ino"));
+  Serial.println(F("A simple demonstration of TinyGPSPlus with an attached GPS module"));
+  Serial.print(F("Testing TinyGPSPlus library v. ")); Serial.println(TinyGPSPlus::libraryVersion());
+  Serial.println(F("by Mikal Hart"));
+  Serial.println();
+}
+
+void loop()
+{
+  // This sketch displays information every time a new sentence is correctly encoded.
+  while (ss.available() > 0)
+    if (gps.encode(ss.read()))
+      displayInfo();
+
+//  if(millis()-startTime>1000){
+//    startTime = millis();
+//    sendLora();
+//  }
+
+  rot = 0;
+  counter = 0;
+  counter2 = 0;
+  depth = rot * 20;
+
+  // grid entire area
+  float x[] = {32.9145309, 32.91516140, 32.91585490, 32.91639530, 32.91711580, 32.91789030, 32.91784530, 32.91721490, 32.91646730, 32.91587290, 32.91525150, 32.91453990, 32.91441380, 32.91526950, 32.91608910, 32.91601700, 32.91535950, 32.91439580};
+  float y[] = {-117.0998704, -117.09994550, -117.10013870, -117.10025670, -117.10036400, -117.10039620, -117.10085750, -117.10085750, -117.10077170, -117.10070730, -117.10063220, -117.10053560, -117.10110430, -117.10124370, -117.10135100, -117.10198400, -117.10183380};
+
+  // low water level pts
+//  float x[] = {32.9147482, 32.91558470, 32.91646280, 32.91686810, 32.91719010, 32.91740630, 32.91759540, 32.91783410, 32.91786110, 32.91765170, 32.91743550, 32.91721490, 32.91689290, 32.91664070, 32.91638850, 32.91636830, 32.91605080, 32.91604180, 32.91569500, 32.91569730, 32.91536180, 32.91536400, 32.91489790, 32.91491600, 32.91446790, 32.91443860, 32.91397480, 32.91397030};
+//  float y[] = {-117.0999536, -117.10010650, -117.10026200, -117.10054100, -117.10052490, -117.10051420, -117.10049270, -117.10045780, -117.10068320, -117.10073680, -117.10078780, -117.10084140, -117.10089240, -117.10086550, -117.10118470, -117.10080650, -117.10078780, -117.10119810, -117.10121960, -117.10077170, -117.10073140, -117.10120350, -117.10123300, -117.10067510, -117.10062150, -117.10123570, -117.10121690, -117.10059200};
+
+
+  for(int i = 0; i<sizeof(x)/sizeof(x[i]); i++){
+    if ((abs(gps.location.lat()-x[i])<0.0002) && (abs(gps.location.lng()- y[i])<0.0002)){
+      // stop boat & collect data
+      delay(1000);
+      while (rot < 10) {
+        if (millis() - lastMillis > 0) {
+          lastMillis = millis();
+          aState = digitalRead(outputA);
+          digitalWrite(9, HIGH);
+          digitalWrite(8, LOW);
+          if (aState != aLastState) {
+            counter++;
+            if (counter % 40 == 0) {
+              rot++;
+            }
+          }
+          aLastState = aState;
+        }
+       }
+      digitalWrite(9, LOW); 
+
+    //insert delay
+  
+    while (rot < 20) {
+      if (millis() - lastMillis > 0) {
+        lastMillis = millis();
+        aState = digitalRead(outputA);
+        digitalWrite(9, HIGH);
+        digitalWrite(8, LOW);
+        if (aState != aLastState) {
+          counter++;
+          if (counter % 40 == 0) {
+            rot++;
+            Serial.print("Rotation ");
+            Serial.println(rot);
+          }
+        }
+        aLastState = aState;
+      }
+    }
+    digitalWrite(9,LOW);
+  
+    //insert delay
+  
+  
+    while (rot < 30) {
+      if (millis() - lastMillis > 0) {
+        lastMillis = millis();
+        aState = digitalRead(outputA);
+        digitalWrite(9, HIGH);
+        digitalWrite(8, LOW);
+        if (aState != aLastState) {
+          counter++;
+          if (counter % 40 == 0) {
+            rot++;
+            Serial.print("Rotation ");
+            Serial.println(rot);
+          }
+        }
+        aLastState = aState;
+      }
+    }
+    digitalWrite(9,LOW);
+  
+    //insert delay
+  
+    rot = 0;
+    aState = digitalRead(outputA);
+    int change = 0;
+    lastMillis2 = millis();
+  
+    while (rot < 29 || change > 4) {
+      lastMillis = millis();
+      digitalWrite(9, HIGH);
+      digitalWrite(8, LOW);
+      if (millis() - lastMillis >= 0) {
+        lastMillis = millis();
+        aState = digitalRead(outputA);
+        if (aState != aLastState) {
+          aLastState = digitalRead(outputA);
+          counter++;
+          if (counter % 40 == 0) {
+            rot++;
+          }
+        }
+        if (millis() - lastMillis2 > 170) {
+          lastMillis2 = millis();
+          change = counter - counter2;
+          counter2 = counter;
+        }
+      }
+    }
+    digitalWrite(8,LOW);
+
+      
+    }
+    
+  }
+
+  
+  
+  
+
+  if (millis()>15000 && gps.charsProcessed()<10){
+    Serial.println("No GPS Detected");
+    while(true);
+  }
+
+  String gpstime;
+
+  if (gps.location.isValid())
+  {
+    gpstime += String(gps.location.lat(), 6); 
+    gpstime += "," + String(gps.location.lng(), 6);
+  }
+  else
+  {
+    gpstime += "N/A";
+    gpstime += ",N/A";
+  }
+  
+  String hour, minute, second;
+  if (gps.time.hour() < 10) {
+    hour = zero + String(gps.time.hour());
+  }
+  else {
+    hour = String(gps.time.hour());
+  }
+
+  if (gps.time.minute() < 10) {
+    minute = zero + String(gps.time.minute());
+  }
+  else {
+    minute = String(gps.time.minute());
+  }
+
+  if (gps.time.second() < 10) {
+    second = zero + String(gps.time.second());
+  }
+  else {
+    second = String(gps.time.second());
+  }
+
+  String timeStr;
+  if (gps.date.isValid() && gps.time.isValid()) {
+    timeStr = String(gps.date.year()) + "-" + String(gps.date.month()) + "-" + String(gps.date.day()) + " " + hour + ":" + minute + ":" + second;
+    gpstime += "," + timeStr + ",";
+  }
+  else {
+    Serial.println("NA");
+  }
+
+
+  if(Serial.available()){
+      LoRa.beginPacket();
+      LoRa.setTxPower(14,RF_PACONFIG_PASELECT_PABOOST);
+      LoRa.print(gpstime + Serial.readStringUntil('\n') + ",2" + depth);
+      Serial.print(gpstime);
+      LoRa.endPacket(); 
+  }
+  
+
+  if (millis() > 5000 && gps.charsProcessed() < 10)
+  {
+    Serial.println(F("No GPS detected: check wiring."));
+    while(true);
+  }
+
+  
+}
+
+
+void sendLora(){
+//  Serial.print();
+//  Serial.println("-------------------------------------------");
+//  LoRa.beginPacket();
+//  LoRa.setTxPower(14,RF_PACONFIG_PASELECT_PABOOST);
+//  LoRa.print();
+//  LoRa.endPacket(); 
+ }
+
+  
+void displayInfo()
+{
+  Serial.print(F("Location: ")); 
+  if (gps.location.isValid())
+  {
+    Serial.print(String(gps.location.lat(), 6));
+    Serial.print(F(","));
+    Serial.print(String(gps.location.lng(), 6));
+  }
+  else
+  {
+    Serial.print(F("INVALID"));
+  }
+
+  Serial.print(F("  Date/Time: "));
+  if (gps.date.isValid())
+  {
+    Serial.print(gps.date.month());
+    Serial.print(F("/"));
+    Serial.print(gps.date.day());
+    Serial.print(F("/"));
+    Serial.print(gps.date.year());
+  }
+  else
+  {
+    Serial.print(F("INVALID"));
+  }
+
+  Serial.print(F(" "));
+  if (gps.time.isValid())
+  {
+    if (gps.time.hour() < 10) Serial.print(F("0"));
+    Serial.print(gps.time.hour());
+    Serial.print(F(":"));
+    if (gps.time.minute() < 10) Serial.print(F("0"));
+    Serial.print(gps.time.minute());
+    Serial.print(F(":"));
+    if (gps.time.second() < 10) Serial.print(F("0"));
+    Serial.print(gps.time.second());
+    Serial.print(F("."));
+    if (gps.time.centisecond() < 10) Serial.print(F("0"));
+    Serial.print(gps.time.centisecond());
+  }
+  else
+  {
+    Serial.print(F("INVALID"));
+  }
+
+  Serial.println();
+}
