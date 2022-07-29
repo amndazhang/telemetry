@@ -14,12 +14,15 @@ TinyGPSPlus gps;
 // The serial connection to the GPS device
 SoftwareSerial ss(RXPin, TXPin);
 
+
 #include "heltec.h"
 #define BAND    915E6
 
 int counter = 0;
 int startTime = millis();
-//String message;
+String gpstime;
+String hour, minute, second;
+String timeStr;
 
 String zero = "0";
 
@@ -27,7 +30,7 @@ void setup()
 {
   Heltec.begin(true /*DisplayEnable Enable*/, true /*Heltec.LoRa Disable*/, false /*Serial Enable*/, true /*PABOOST Enable*/, BAND /*long BAND*/);
 
-  Serial.begin(115200);
+  Serial.begin(115200); //for gps
   while(!Serial);
   ss.begin(GPSBaud);
   while(!ss);
@@ -56,7 +59,6 @@ void loop()
     while(true);
   }
 
-  String gpstime;
 
   if (gps.location.isValid())
   {
@@ -69,7 +71,6 @@ void loop()
     gpstime += ",N/A";
   }
   
-  String hour, minute, second;
   if (gps.time.hour() < 10) {
     hour = zero + String(gps.time.hour());
   }
@@ -91,7 +92,6 @@ void loop()
     second = String(gps.time.second());
   }
 
-  String timeStr;
   if (gps.date.isValid() && gps.time.isValid()) {
     timeStr = String(gps.date.year()) + "-" + String(gps.date.month()) + "-" + String(gps.date.day()) + " " + hour + ":" + minute + ":" + second;
     gpstime += "," + timeStr + ",";
@@ -100,15 +100,12 @@ void loop()
     Serial.println("NA");
   }
 
-  //boat 1 = even seconds
-  if(gps.time.second()%2 == 0){
-    if(Serial.available()){
+  if(Serial.available()){
       LoRa.beginPacket();
       LoRa.setTxPower(14,RF_PACONFIG_PASELECT_PABOOST);
-      LoRa.print(gpstime + Serial.readStringUntil('\n') + ",1");
+      LoRa.print(gpstime + Serial.readStringUntil('\n') + ",1,0");
       Serial.print(gpstime);
       LoRa.endPacket(); 
-   }
   }
 
   //boat 2 = odd seconds
