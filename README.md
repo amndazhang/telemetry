@@ -1,5 +1,4 @@
-# Telemetry, GPS, Solar
-### Group 5
+# Group 5 - Telemetry, GPS, Solar
 
 CleanLoRaGPS : Cleaned, untested WorkingLoraCodeWithGPS (created methods and cleaned formatting).
 
