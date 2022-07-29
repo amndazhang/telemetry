@@ -1,5 +1,5 @@
-# Group 5 - Telemetry, GPS, Solar
-### COSMOS UCSD Cluster 13 -- H4O: Hacking 4 Oceans
+### Telemetry, GPS, Solar
+# Group 5
 
 CleanLoRaGPS : Cleaned, untested WorkingLoraCodeWithGPS (created methods and cleaned formatting).
 
