@@ -1,6 +1,5 @@
 # COSMOS UCSD Cluster 13 -- H4O: Hacking 4 Oceans
-# Telemetry, GPS, Solar
-### Group 5
+### Group 5 - Telemetry, GPS, Solar
 
 JSONGPS : Read in GPS tracking coordinates at GMT time and document desired data into JSON format.
 WorkingLoraCodeWithGPS : Sender code, implements GPS/time + sensor code from Arduino Mega.
