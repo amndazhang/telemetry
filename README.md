@@ -1,5 +1,13 @@
 # Group 5 - Telemetry, GPS, Solar
 
+### COSMOS UCSD Cluster 13 -- H4O: Hacking 4 Oceans
+
+
+
+....
+
+
+
 CleanLoRaGPS : Cleaned, untested WorkingLoraCodeWithGPS (created methods and cleaned formatting).
 
 JSONGPS : Read in GPS tracking coordinates at GMT time and document desired data into JSON format.
