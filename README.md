@@ -1,3 +1,4 @@
+# COSMOS UCSD Cluster 13 -- H4O: Hacking 4 Oceans
 # Telemetry, GPS, Solar
 ### Group 5
 
