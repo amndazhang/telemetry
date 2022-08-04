@@ -2,7 +2,7 @@
 
 ### COSMOS UCSD Cluster 13 -- H4O: Hacking 4 Oceans
 
-
+final: https://github.com/jmtritch/COSMOS22-Cluster13/tree/main/4-telemetry
 
 ....
 
